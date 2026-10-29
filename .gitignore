@@ -1,0 +1,23 @@
+# Сборка
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Отладочные артефакты приложения
+debug.log
+error.log
+debug_*.wav
+debug_*.bmp
+debug_*.png
+*.binlog
+
+# Снимки экрана и временные картинки
+*.png
+!docs/**/*.png
+
+# Прочее
+App.config.*
+publish/
+TestResults/

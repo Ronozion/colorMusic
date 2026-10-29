@@ -1,0 +1,236 @@
+<Window x:Class="TrafficLight.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="clr-namespace:TrafficLight.Visuals"
+        xmlns:gpu="clr-namespace:TrafficLight.Visuals.Gpu"
+        Title="Частотный светофор" Height="760" Width="1200"
+        Background="#000000" WindowStartupLocation="CenterScreen"
+        KeyDown="Window_KeyDown" Loaded="Window_Loaded" Closing="Window_Closing">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Theme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#C7CDD6"/>
+        </Style>
+        <Style x:Key="HintText" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="Foreground" Value="#7E8794"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style x:Key="SectionHeader" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,14,0,4"/>
+        </Style>
+
+        <!-- Тонкий скруглённый скролл без стрелок и серого «корыта» -->
+        <ControlTemplate x:Key="VBarTemplate" TargetType="ScrollBar">
+            <Grid Background="Transparent">
+                <Track x:Name="PART_Track" IsDirectionReversed="True" Margin="4,3,4,3">
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageUpCommand" Focusable="False" IsTabStop="False">
+                            <RepeatButton.Template>
+                                <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+                            </RepeatButton.Template>
+                        </RepeatButton>
+                    </Track.DecreaseRepeatButton>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageDownCommand" Focusable="False" IsTabStop="False">
+                            <RepeatButton.Template>
+                                <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+                            </RepeatButton.Template>
+                        </RepeatButton>
+                    </Track.IncreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb>
+                            <Thumb.Template>
+                                <ControlTemplate TargetType="Thumb">
+                                    <Border CornerRadius="3"
+                                            Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ScrollBar}}"/>
+                                </ControlTemplate>
+                            </Thumb.Template>
+                        </Thumb>
+                    </Track.Thumb>
+                </Track>
+            </Grid>
+        </ControlTemplate>
+        <ControlTemplate x:Key="HBarTemplate" TargetType="ScrollBar">
+            <Grid Background="Transparent">
+                <Track x:Name="PART_Track" Margin="3,4,3,4">
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageLeftCommand" Focusable="False" IsTabStop="False">
+                            <RepeatButton.Template>
+                                <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+                            </RepeatButton.Template>
+                        </RepeatButton>
+                    </Track.DecreaseRepeatButton>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageRightCommand" Focusable="False" IsTabStop="False">
+                            <RepeatButton.Template>
+                                <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+                            </RepeatButton.Template>
+                        </RepeatButton>
+                    </Track.IncreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb>
+                            <Thumb.Template>
+                                <ControlTemplate TargetType="Thumb">
+                                    <Border CornerRadius="3"
+                                            Background="{Binding Background, RelativeSource={RelativeSource AncestorType=ScrollBar}}"/>
+                                </ControlTemplate>
+                            </Thumb.Template>
+                        </Thumb>
+                    </Track.Thumb>
+                </Track>
+            </Grid>
+        </ControlTemplate>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Background" Value="#4CFFFFFF"/>
+            <Setter Property="Width" Value="12"/>
+            <Setter Property="MinWidth" Value="12"/>
+            <Setter Property="Template" Value="{StaticResource VBarTemplate}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#8AFFFFFF"/>
+                </Trigger>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Width" Value="Auto"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="Height" Value="12"/>
+                    <Setter Property="MinHeight" Value="12"/>
+                    <Setter Property="Template" Value="{StaticResource HBarTemplate}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <!-- Визуализация на весь клиент (CPU/WPF-рендер) -->
+        <v:AudioVisualHost x:Name="VisualHost" MouseDown="VisualHost_MouseDown"/>
+
+        <!-- GPU-рендер частиц (D3D11, child HWND): в оконном режиме не заезжает под панель -->
+        <gpu:GpuParticleHost x:Name="GpuHost" Margin="0,0,430,0" Visibility="Hidden"/>
+
+        <!-- Плавающая панель настроек -->
+        <Border x:Name="SettingsPanel" Width="400" HorizontalAlignment="Right"
+                VerticalAlignment="Center" Margin="0,0,24,0"
+                Background="#F0060709" CornerRadius="18" Padding="22,18"
+                BorderThickness="1" BorderBrush="#22262E">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="900">
+                <StackPanel>
+                    <TextBlock Text="Источник звука" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                    <ComboBox x:Name="DeviceBox" Height="30" VerticalContentAlignment="Center">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <Button x:Name="StartStopButton" Content="▶  Запуск"
+                            Style="{StaticResource AccentButton}"
+                            Click="StartStop_Click" Margin="0,14,0,0"
+                            Padding="14,10" FontSize="14" FontWeight="SemiBold"
+                            HorizontalAlignment="Left" MinWidth="160"/>
+                    <TextBlock x:Name="StatusText" Style="{StaticResource HintText}"
+                               Text="Остановлено" Margin="0,8,0,0"/>
+
+                    <StackPanel Margin="0,14,0,0">
+                        <TextBlock Text="Режим" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="ModeBox" Height="30" SelectedIndex="2"
+                                  SelectionChanged="Mode_Changed">
+                            <ComboBoxItem Content="Светофор"/>
+                            <ComboBoxItem Content="Частицы — 3 пластины"/>
+                            <ComboBoxItem Content="Частицы — одно поле"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <TextBlock Text="Частицы на полосу (режим GPU)" Style="{StaticResource SectionHeader}"/>
+                    <ComboBox x:Name="ParticleCountBox" Height="30" SelectedIndex="1"
+                              SelectionChanged="ParticleCount_Changed">
+                        <ComboBoxItem Content="20 000"/>
+                        <ComboBoxItem Content="60 000"/>
+                        <ComboBoxItem Content="150 000"/>
+                    </ComboBox>
+
+                    <TextBlock Text="Монитор для полного экрана" Style="{StaticResource SectionHeader}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="MonitorBox" Height="30" VerticalContentAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Grid.Column="2" Content="⟳" Width="34" Height="30"
+                                Click="RefreshMonitors_Click" ToolTip="Обновить список мониторов"/>
+                    </Grid>
+
+                    <Button x:Name="FullscreenButton" Content="⛶  Полный экран (F11)"
+                            Click="Fullscreen_Click" Margin="0,14,0,0" Padding="14,8"
+                            HorizontalAlignment="Left" MinWidth="200"/>
+                    <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,6,0,0"
+                               Text="F11 — полный экран, Esc — выход, Tab — спрятать/показать панель, двойной клик по экрану — выход из полного экрана."/>
+
+                    <CheckBox x:Name="AutoNormCheck" Content="Автономализация по каждой полосе"
+                              IsChecked="True" Margin="0,16,0,0" FontSize="13" Foreground="#C7CDD6"
+                              Checked="AutoNorm_Changed" Unchecked="AutoNorm_Changed"/>
+                    <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="20,2,0,0"
+                               Text="Каждая полоса подстраивается под свой недавний пик (~4 с), поэтому громкость песни или записи не важна. Шипение и тишина лампы не зажигают."/>
+
+                    <TextBlock Text="Общая чувствительность" Style="{StaticResource SectionHeader}"/>
+                    <Slider x:Name="SensSlider" Minimum="0.5" Maximum="2" Value="1"
+                            ValueChanged="SensSlider_ValueChanged"/>
+                    <TextBlock x:Name="SensValue" Style="{StaticResource HintText}" Text="100 %"/>
+
+                    <TextBlock Text="Порог включения (доля от пика полосы)" Style="{StaticResource SectionHeader}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="46"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Басы (красный)" Foreground="#FFB4AD" VerticalAlignment="Center"/>
+                        <Slider Grid.Row="0" Grid.Column="1" x:Name="BassThresholdSlider"
+                                Minimum="0" Maximum="1" Value="0.50" ValueChanged="Threshold_ValueChanged"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" x:Name="BassThresholdValue"
+                                   Style="{StaticResource HintText}" Text="50 %" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="1" Text="Середина (зелёный)" Foreground="#A7E7B9" VerticalAlignment="Center"/>
+                        <Slider Grid.Row="1" Grid.Column="1" x:Name="MidThresholdSlider"
+                                Minimum="0" Maximum="1" Value="0.50" ValueChanged="Threshold_ValueChanged"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" x:Name="MidThresholdValue"
+                                   Style="{StaticResource HintText}" Text="50 %" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Row="2" Text="Верха (жёлтый)" Foreground="#FFE19B" VerticalAlignment="Center"/>
+                        <Slider Grid.Row="2" Grid.Column="1" x:Name="HighThresholdSlider"
+                                Minimum="0" Maximum="1" Value="0.50" ValueChanged="Threshold_ValueChanged"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" x:Name="HighThresholdValue"
+                                   Style="{StaticResource HintText}" Text="50 %" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,10,0,0"
+                               Text="В режиме частиц доминирующая частота каждой полосы выбирает узор фигуры Хладни, а уровень полосы «трясёт» пластину."/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>
+
+
+
+
+
