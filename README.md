@@ -132,6 +132,13 @@ the pattern fills the whole screen with no borders and no aspect squashing:
 
 ![3 plates](docs/screenshots/three_plates.png)
 
+## Support
+
+If you found this project useful and want to fuel its development —
+[a word of thanks on Boosty](https://boosty.to/ronozion) is much appreciated.
+
+[![Boosty](https://img.shields.io/badge/boosty-ronozion-FF5C00?logo=boosty&logoColor=white)](https://boosty.to/ronozion)
+
 ## License
 
 MIT — see [LICENSE](LICENSE). Use, modify, redistribute freely.
