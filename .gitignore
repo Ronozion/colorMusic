@@ -21,3 +21,4 @@ debug_*.png
 App.config.*
 publish/
 TestResults/
+*.zip

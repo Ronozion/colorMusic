@@ -9,6 +9,12 @@
     <RootNamespace>TrafficLight</RootNamespace>
     <AssemblyName>TrafficLight</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Релизные метаданные (видно в свойствах TrafficLight.exe) -->
+    <Version>0.1.0</Version>
+    <Product>TrafficLight</Product>
+    <Company>ronoz</Company>
+    <Copyright>MIT © 2026 ronoz</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
