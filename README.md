@@ -1,127 +1,134 @@
-# 🚦 TrafficLight — частотный светофор и фигуры Хладни
+# 🚦 TrafficLight — a frequency traffic light & Chladni figures
 
-Музыкальная визуализация для Windows: слушает системный звук (WASAPI loopback)
-или микрофон, делит спектр на три цветовые полосы и реагирует на них —
-ретро-светофором с лампами накаливания или «пластинами Хладни», где тысячи
-частиц на GPU собираются в узоры стоячих волн в такт музыке.
+Music visualization for Windows: it listens to system audio (WASAPI loopback)
+or the microphone, splits the spectrum into three colour bands and reacts to
+them — either as a retro incandescent traffic light, or as “Chladni plates”
+where tens of thousands of GPU particles gather into standing-wave patterns in
+time with the music.
 
-| Цвет    | Полоса          |
-|---------|-----------------|
-| 🔴 Красный | Басы, 20–250 Гц    |
-| 🟢 Зелёный | Середина, 250 Гц – 2 кГц |
-| 🟡 Жёлтый  | Верха, 2–16 кГц    |
+| Colour | Band |
+|--------|------|
+| 🔴 Red | Bass, 20–250 Hz |
+| 🟢 Green | Mids, 250 Hz – 2 kHz |
+| 🟡 Yellow | Highs, 2–16 kHz |
 
-## Возможности
+## Features
 
-- **Три режима**: светофор — процедурные стеклянные линзы на шейдере
-  (концентрические рёбра Френеля, горячее ядро, ореолы, блик, кант, мерцание
-  накаливания), частицы на трёх пластинах, частицы на одном поле — все три
-  цвета на одном поле и складываются аддитивно, вспышки подсвечивают только
-  частицы.
-- **GPU-физика и шейдеры**: до 150 000 частиц на полосу в D3D11 compute-шейдере,
-  светофор — пиксельным шейдером fullscreen-проходом; при отсутствии GPU —
-  автоматический фолбэк на WPF/CPU-отрисовку.
-- **Автономизация**: каждая полоса сама подстраивает усиление по скользящему
-  95-му перцентилю (~4 с). Громкость трека, записи или микрофона не важна —
-  ползунки крутить не нужно. Плюс **гейт присутствия**: если полосы в треке
-  просто нет (нет баса, срезанные верха), она не «вытягивает» себя из шума —
-  остаётся погашенной, даже если соседние полосы громкие.
-- **OLED-friendly**: фон — чистый чёрный #000, свет есть только там, где он нужен.
-- **Фуллскрин на выбранный монитор**, пиксель-в-пиксель, с учётом разного DPI
-  мониторов.
-- Ручные настройки: порог включения каждой полосы, чувствительность, число
-  частиц, источник звука, монитор.
+- **Three modes**: traffic light — procedural glass lenses rendered by a
+  shader (concentric Fresnel ribs, hot filament core, halos, specular
+  highlight, rim light, incandescent flicker); particles on three plates;
+  particles on a single field — all three colours share one canvas and
+  combine additively, and flashes light up particles only, never the
+  background.
+- **GPU physics & shaders**: up to 150,000 particles per band in a D3D11
+  compute shader; the traffic light is a fullscreen pixel-shader pass. With
+  no GPU available the app falls back to WPF/CPU rendering automatically.
+- **Self-normalizing audio**: each band adjusts its own gain using a sliding
+  95th percentile (~4 s window). The loudness of the track, recording or mic
+  doesn't matter — no sliders to fiddle with. Plus a **presence gate**: if a
+  band simply isn't present in the track (no bass, rolled-off highs), it does
+  not amplify itself out of the noise floor — it stays dark even when
+  neighbouring bands are loud.
+- **OLED-friendly**: the background is pure black #000; light is emitted only
+  where it is earned.
+- **Fullscreen on a chosen monitor**, pixel-perfect, with mixed per-monitor
+  DPI handled correctly.
+- Manual controls: per-band trigger threshold, overall sensitivity, particle
+  count, audio source, target monitor. (The UI itself is in Russian.)
 
-## Быстрый старт
+## Quick start
 
 ```powershell
 dotnet build TrafficLight/TrafficLight.csproj -c Release
 TrafficLight\bin\Release\net10.0-windows\TrafficLight.exe
 ```
 
-1. В панели выбрать **Источник звука** (предвыбран системный вывод
-   «по умолчанию») и нажать **Запуск**.
-2. Выбрать режим: светофор, три пластины или одно поле.
-3. **F11** — полный экран.
+1. In the panel pick the audio source (the system default output is
+   preselected, button «Запуск» starts the analyzer).
+2. Pick a mode: traffic light, three plates, or a single field.
+3. **F11** — fullscreen.
 
-> ⚠️ Если в списке устройств выбрать безмолвный выход (например HDMI/ТВ),
-> звука в приложении не будет: WASAPI loopback отдаёт данные только когда на
-> этом выходе что-то играет. Для микрофона — выбрать «Микрофон: …».
+> ⚠️ If you select a silent output device (e.g. an HDMI/TV port) you will get
+> no audio: WASAPI loopback delivers data only while something is actually
+> playing on that endpoint. For microphone input pick «Микрофон: …».
 
-## Горячие клавиши
+## Hotkeys
 
-| Клавиша | Действие |
-|---------|----------|
-| **F11** | Полный экран (на выбранный монитор) |
-| **Esc** / двойной клик по экрану | Выход из полного экрана |
-| **Tab** | Скрыть/показать панель настроек |
+| Key | Action |
+|-----|--------|
+| **F11** | Fullscreen (on the selected monitor) |
+| **Esc** / double-click on screen | Exit fullscreen |
+| **Tab** | Hide/show the settings panel |
 
-## Как это работает
+## How it works
 
-- `NAudio` → `WasapiLoopbackCapture` / `WasapiCapture` (float32, порции ~10 мс).
-- Моно → кольцевой буфер 8192 отсчёта; каждые 2048 — окно Ханна + FFT (2¹³).
-- Уровень полосы = среднее верхних ⅛ сильнейших бинов полосы (разреженные
-  верха не тонут в пустых бинах); авто-пик по времени + гейт тишины по RMS.
-- Доминанта + центроид тембра каждой полосы (лог-шкала) непрерывно выбирают
-  и морфят моду узора Хладни; наклон тональности крутит узор, поток спектра
-  даёт «довесок» живости.
-- Фолбэк без GPU: светофор и частицы — кодовая отрисовка в `OnRender` (WPF).
-- Основной GPU-путь: `GpuParticleHost` (HwndHost + D3D11) — физика частиц в
-  compute-шейдере, отрисовка instanced-квадами с аддитивным блендом;
-  светофор — fullscreen-пиксельный шейдер с процедурными линзами Френеля.
+- `NAudio` → `WasapiLoopbackCapture` / `WasapiCapture` (float32, ~10 ms packets).
+- Mono → an 8192-sample ring buffer; every 2048 samples a Hann window + FFT (2¹³).
+- Band level = the mean of the top ⅛ strongest bins within the band (sparse
+  highs don't drown in empty bins); auto-gain over a rolling peak + a silence
+  gate on master RMS.
+- Each band's dominant frequency plus its spectral centroid (log scale)
+  continuously select and cross-morph the Chladni pattern — driven by the
+  music, not by timers; the pitch slope spins the pattern, spectral flux adds
+  extra liveliness.
+- CPU fallback path: the traffic light and particles are drawn in code in
+  WPF's `OnRender`.
+- Main GPU path: `GpuParticleHost` (HwndHost + D3D11) — particle physics in a
+  compute shader, rendered as instanced quads with additive blending; the
+  traffic light is a fullscreen pixel shader with procedural Fresnel glass.
 
-## Структура проекта
+## Project layout
 
 ```
 TrafficLight/
-  Audio/FftAnalyzer.cs             — FFT, полосы, уровни, автономизация, доминанты
-  Visuals/AudioVisualHost.cs       — WPF-слой: светофор и CPU-частицы (фолбэк)
-  Visuals/LampField.cs             — кодовая отрисовка светофора (фолбэк)
-  Visuals/ParticleEngine.cs        — CPU-частицы Хладни (фолбэк)
-  Visuals/Gpu/GpuParticleHost.cs   — GPU: частицы (compute+draw) и шейдерный светофор (HLSL)
-  Visuals/ParticleLayout.cs        — раскладка пластин/поля (единая для CPU и GPU)
-  Visuals/ChladniModes.cs          — 4 семейства узоров (Хладни-пары, поворот, соты, розетки)
-  Visuals/Displays.cs              — мониторы и фуллскрин (Win32)
-  MainWindow.xaml(.cs)             — панель настроек, устройства, фуллскрин
-  Theme.xaml                       — тёмная тема элементов управления
-  app.manifest                     — PerMonitorV2 DPI-манифест
-AnalyzeTest/                       — синтетический тест анализатора (dotnet run)
-AudioTest/                         — тест устройств NAudio: loopback/микрофон (dotnet run)
-TestHook/                          — тест двойного клика по GPU-полю (dotnet run)
-skills/                            — переносимые заметки-скилы (WPF+D3D11, WASAPI, UIA)
-CONTEXT.md                         — рабочие заметки по коду (для новых сессий)
+  Audio/FftAnalyzer.cs             — FFT, bands, levels, self-normalization, pitch tracking
+  Visuals/AudioVisualHost.cs       — WPF layer: traffic light + CPU particles (fallback)
+  Visuals/LampField.cs             — traffic-light drawing (fallback)
+  Visuals/ParticleEngine.cs        — CPU Chladni particles (fallback)
+  Visuals/Gpu/GpuParticleHost.cs   — GPU: particles (compute+draw) and the shader lamps (HLSL)
+  Visuals/ParticleLayout.cs        — plate/field layout (shared by CPU and GPU)
+  Visuals/ChladniModes.cs          — 4 pattern families (Chladni pairs, rotation, honeycombs, rosettes)
+  Visuals/Displays.cs              — monitors & fullscreen (Win32)
+  MainWindow.xaml(.cs)             — settings panel, devices, fullscreen
+  Theme.xaml                       — dark control theme
+  app.manifest                     — PerMonitorV2 DPI manifest
+AnalyzeTest/                       — synthetic analyzer test (dotnet run)
+AudioTest/                         — NAudio device test: loopback/mic (dotnet run)
+TestHook/                          — GPU-surface double-click test (dotnet run)
+skills/                            — portable how-to notes (WPF+D3D11, WASAPI, UIA)
+CONTEXT.md                         — development journal & pitfall log (kept in Russian)
 ```
 
-## Тесты
+## Tests
 
 ```powershell
-dotnet run --project AnalyzeTest   # FFT/полосы на синтетических сигналах
-dotnet run --project AudioTest     # список устройств + захват вживую
-dotnet run --project TestHook      # логика двойного клика GPU-хоста
+dotnet run --project AnalyzeTest   # FFT/bands on synthetic signals
+dotnet run --project AudioTest     # device list + live capture
+dotnet run --project TestHook      # GPU host double-click logic
 ```
 
-## Требования
+## Requirements
 
-- Windows 10/11 + .NET 10 Desktop Runtime (SDK 10 — для сборки);
-- для GPU-частиц видеодрайвер с Direct3D 11 feature level 11_0+
-  (без него — автоматический CPU-фолбэк).
+- Windows 10/11 + .NET 10 Desktop Runtime (SDK 10 to build);
+- GPU particles need a driver with Direct3D 11 feature level 11_0+
+  (without it — automatic CPU fallback).
 
-## Скриншоты
+## Screenshots
 
-**Светофор** — рифлёные стеклянные линзы с отражениями, каустикой и
-шкалами-«таблетками»:
+**Traffic light** — ribbed glass lenses with window reflections, caustics and
+pill-shaped gauges:
 
-![светофор](docs/screenshots/lamps_shader.png)
+![traffic light](docs/screenshots/lamps_shader.png)
 
-**Частицы — одно поле** — все три полосы на одном холсте, цвета складываются
-аддитивно, узор занимает весь экран без рамок и «плющения»:
+**Particles, single field** — all three bands on one canvas, additive colours,
+the pattern fills the whole screen with no borders and no aspect squashing:
 
-![одно поле](docs/screenshots/single_field.png)
+![single field](docs/screenshots/single_field.png)
 
-**Частицы — 3 пластины** — каждая полоса на своей «пластине Хладни»:
+**Particles, 3 plates** — one band per Chladni plate:
 
-![3 пластины](docs/screenshots/three_plates.png)
+![3 plates](docs/screenshots/three_plates.png)
 
-## Лицензия
+## License
 
-MIT — см. [LICENSE](LICENSE). Пользуйтесь, модифицируйте, публикуйте свободно.
+MIT — see [LICENSE](LICENSE). Use, modify, redistribute freely.

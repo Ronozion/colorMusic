@@ -1,11 +1,11 @@
-# Сборка
+# Build output
 bin/
 obj/
 *.user
 *.suo
 .vs/
 
-# Отладочные артефакты приложения
+# Application debug artifacts
 debug.log
 error.log
 debug_*.wav
@@ -13,11 +13,11 @@ debug_*.bmp
 debug_*.png
 *.binlog
 
-# Снимки экрана и временные картинки
+# Screen captures and temporary images
 *.png
 !docs/**/*.png
 
-# Прочее
+# Misc
 App.config.*
 publish/
 TestResults/

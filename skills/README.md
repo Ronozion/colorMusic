@@ -1,12 +1,12 @@
-# Скилов здесь больше нет
+# Skills no longer live here
 
-Локальные копии скилов этого проекта удалены 2026-10-29 как дубли: они
-расходились по содержимому с актуальными версиями и в интерфейсе Strata не
-отображались.
+Local copies of this project's skills were removed on 2026-10-29 as duplicates:
+they had drifted from the canonical versions and were not shown in the Strata
+UI anyway.
 
-Единственное место, где скилы живут: `Documents\Strata\Workspace\skills\`
-(плюс «встроенные» скилы Strata). Оттуда они действуют на весь каталог Strata,
-так что в папке проекта копия не нужна.
+The single home for skills is `Documents\Strata\Workspace\skills\` (plus
+Strata's built-in skills). From there they apply across the whole Strata
+workspace, so a copy inside the project folder is not needed.
 
-Скилы, которые раньше лежали здесь: wasapi-loopback-capture, wpf-d3d11-hosting,
-windows-ui-probing — все они целы в корневой папке скилов.
+Skills that used to live here: wasapi-loopback-capture, wpf-d3d11-hosting,
+windows-ui-probing — all intact in the skills root.
