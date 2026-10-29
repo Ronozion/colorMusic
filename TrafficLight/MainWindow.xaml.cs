@@ -142,7 +142,7 @@ public partial class MainWindow : Window
         UpdateGpuPresentation();
         TryDarkTitleBar();
         if (_modeIndex != 0 && !GpuHost.GpuReady && GpuHost.FailReason is not null)
-            StatusText.Text = $"GPU недоступен ({GpuHost.FailReason}) — частицы на CPU.";
+            StatusText.Text = string.Format(App.T("L.StatusGpuFallbackFmt"), GpuHost.FailReason);
     }
 
     /// <summary>Тёмная системная шапка окна (DWM), чтобы не выбивалась из тёмной темы.</summary>
@@ -178,7 +178,7 @@ public partial class MainWindow : Window
             foreach (var d in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
             {
                 bool isDef = d.ID == defRenderId;
-                choices.Add(new DeviceChoice { Label = $"Системный звук: {d.FriendlyName}" + (isDef ? "  (по умолчанию)" : ""), Device = d, IsLoopback = true });
+                choices.Add(new DeviceChoice { Label = string.Format(App.T("L.DevSystemFmt"), d.FriendlyName) + (isDef ? App.T("L.DevDefault") : ""), Device = d, IsLoopback = true });
                 if (isDef && preferred < 0)
                     preferred = choices.Count - 1;
             }
@@ -186,7 +186,7 @@ public partial class MainWindow : Window
             foreach (var d in enumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
             {
                 bool isDef = d.ID == defCaptureId;
-                choices.Add(new DeviceChoice { Label = $"Микрофон: {d.FriendlyName}" + (isDef ? "  (по умолчанию)" : ""), Device = d, IsLoopback = false });
+                choices.Add(new DeviceChoice { Label = string.Format(App.T("L.DevMicFmt"), d.FriendlyName) + (isDef ? App.T("L.DevDefault") : ""), Device = d, IsLoopback = false });
             }
 
             DeviceBox.ItemsSource = choices;
@@ -195,7 +195,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            StatusText.Text = $"Не удалось перечислить устройства: {ex.Message}";
+            StatusText.Text = string.Format(App.T("L.StatusEnumErrFmt"), ex.Message);
         }
     }
 
@@ -223,7 +223,7 @@ public partial class MainWindow : Window
     {
         if (DeviceBox.SelectedItem is not DeviceChoice choice || choice.Device is null)
         {
-            StatusText.Text = "Выберите устройство ввода/воспроизведения.";
+            StatusText.Text = App.T("L.StatusNoDevice");
             return;
         }
 
@@ -247,15 +247,15 @@ public partial class MainWindow : Window
             _capture.RecordingStopped += OnRecordingStopped;
             _capture.StartRecording();
 
-            StartStopButton.Content = "⏹  Остановить";
+            StartStopButton.Content = App.T("L.Stop");
             StatusText.Text = choice.IsLoopback
-                ? $"Идёт захват системного звука: {choice.Device.FriendlyName} ({wf.SampleRate} Гц)"
-                : $"Идёт запись с микрофона: {choice.Device.FriendlyName} ({wf.SampleRate} Гц)";
+                ? string.Format(App.T("L.StatusSysFmt"), choice.Device.FriendlyName, wf.SampleRate)
+                : string.Format(App.T("L.StatusMicFmt"), choice.Device.FriendlyName, wf.SampleRate);
         }
         catch (Exception ex)
         {
             Stop();
-            StatusText.Text = $"Ошибка запуска: {ex.Message}";
+            StatusText.Text = string.Format(App.T("L.StatusStartErrFmt"), ex.Message);
         }
     }
 
@@ -271,7 +271,7 @@ public partial class MainWindow : Window
             try { cap.StopRecording(); } catch { /* уже остановлен */ }
             cap.Dispose();
         }
-        StartStopButton.Content = "▶  Запуск";
+        StartStopButton.Content = App.T("L.Start");
     }
 
     private void OnRecordingStopped(object? sender, StoppedEventArgs e)
@@ -281,8 +281,8 @@ public partial class MainWindow : Window
             if (_capture is not null)
                 Stop();
             StatusText.Text = e.Exception is null
-                ? "Остановлено."
-                : $"Запись прервана: {e.Exception.Message}";
+                ? App.T("L.StatusStopped")
+                : string.Format(App.T("L.StatusInterruptedFmt"), e.Exception.Message);
         });
     }
 
@@ -406,7 +406,7 @@ public partial class MainWindow : Window
                 Displays.ApplyFullscreen(this, monitor);
 
             SettingsPanel.Visibility = Visibility.Collapsed;
-            FullscreenButton.Content = "🗗  Оконный режим (F11)";
+            FullscreenButton.Content = App.T("L.Windowed");
         }
         else
         {
@@ -438,7 +438,7 @@ public partial class MainWindow : Window
             Dispatcher.BeginInvoke(() => Displays.ApplyBoundsPx(this, b),
                 DispatcherPriority.Loaded);
             SettingsPanel.Visibility = Visibility.Visible;
-            FullscreenButton.Content = "⛶  Полный экран (F11)";
+            FullscreenButton.Content = App.T("L.Fullscreen");
         }
         UpdateGpuPresentation();
     }

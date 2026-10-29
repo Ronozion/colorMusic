@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:v="clr-namespace:TrafficLight.Visuals"
         xmlns:gpu="clr-namespace:TrafficLight.Visuals.Gpu"
-        Title="Частотный светофор" Height="760" Width="1200"
+        Title="{DynamicResource L.Title}" Height="760" Width="1200"
         Background="#000000" WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown" Loaded="Window_Loaded" Closing="Window_Closing">
 
@@ -120,7 +120,7 @@
                 BorderThickness="1" BorderBrush="#22262E">
             <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="900">
                 <StackPanel>
-                    <TextBlock Text="Источник звука" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                    <TextBlock Text="{DynamicResource L.Source}" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
                     <ComboBox x:Name="DeviceBox" Height="30" VerticalContentAlignment="Center">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
@@ -129,25 +129,25 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <Button x:Name="StartStopButton" Content="▶  Запуск"
+                    <Button x:Name="StartStopButton" Content="{DynamicResource L.Start}"
                             Style="{StaticResource AccentButton}"
                             Click="StartStop_Click" Margin="0,14,0,0"
                             Padding="14,10" FontSize="14" FontWeight="SemiBold"
                             HorizontalAlignment="Left" MinWidth="160"/>
                     <TextBlock x:Name="StatusText" Style="{StaticResource HintText}"
-                               Text="Остановлено" Margin="0,8,0,0"/>
+                               Text="{DynamicResource L.Stopped}" Margin="0,8,0,0"/>
 
                     <StackPanel Margin="0,14,0,0">
-                        <TextBlock Text="Режим" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
+                        <TextBlock Text="{DynamicResource L.Mode}" Style="{StaticResource SectionHeader}" Margin="0,0,0,4"/>
                         <ComboBox x:Name="ModeBox" Height="30" SelectedIndex="2"
                                   SelectionChanged="Mode_Changed">
-                            <ComboBoxItem Content="Светофор"/>
-                            <ComboBoxItem Content="Частицы — 3 пластины"/>
-                            <ComboBoxItem Content="Частицы — одно поле"/>
+                            <ComboBoxItem Content="{DynamicResource L.ModeLamps}"/>
+                            <ComboBoxItem Content="{DynamicResource L.ModePlates}"/>
+                            <ComboBoxItem Content="{DynamicResource L.ModeField}"/>
                         </ComboBox>
                     </StackPanel>
 
-                    <TextBlock Text="Частицы на полосу (режим GPU)" Style="{StaticResource SectionHeader}"/>
+                    <TextBlock Text="{DynamicResource L.Particles}" Style="{StaticResource SectionHeader}"/>
                     <ComboBox x:Name="ParticleCountBox" Height="30" SelectedIndex="1"
                               SelectionChanged="ParticleCount_Changed">
                         <ComboBoxItem Content="20 000"/>
@@ -155,7 +155,7 @@
                         <ComboBoxItem Content="150 000"/>
                     </ComboBox>
 
-                    <TextBlock Text="Монитор для полного экрана" Style="{StaticResource SectionHeader}"/>
+                    <TextBlock Text="{DynamicResource L.Monitor}" Style="{StaticResource SectionHeader}"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -170,27 +170,27 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <Button Grid.Column="2" Content="⟳" Width="34" Height="30"
-                                Click="RefreshMonitors_Click" ToolTip="Обновить список мониторов"/>
+                                Click="RefreshMonitors_Click" ToolTip="{DynamicResource L.RefreshTip}"/>
                     </Grid>
 
-                    <Button x:Name="FullscreenButton" Content="⛶  Полный экран (F11)"
+                    <Button x:Name="FullscreenButton" Content="{DynamicResource L.Fullscreen}"
                             Click="Fullscreen_Click" Margin="0,14,0,0" Padding="14,8"
                             HorizontalAlignment="Left" MinWidth="200"/>
                     <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,6,0,0"
-                               Text="F11 — полный экран, Esc — выход, Tab — спрятать/показать панель, двойной клик по экрану — выход из полного экрана."/>
+                               Text="{DynamicResource L.HotkeyHint}"/>
 
-                    <CheckBox x:Name="AutoNormCheck" Content="Автономализация по каждой полосе"
+                    <CheckBox x:Name="AutoNormCheck" Content="{DynamicResource L.AutoNorm}"
                               IsChecked="True" Margin="0,16,0,0" FontSize="13" Foreground="#C7CDD6"
                               Checked="AutoNorm_Changed" Unchecked="AutoNorm_Changed"/>
                     <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="20,2,0,0"
-                               Text="Каждая полоса подстраивается под свой недавний пик (~4 с), поэтому громкость песни или записи не важна. Шипение и тишина лампы не зажигают."/>
+                               Text="{DynamicResource L.AutoNormHint}"/>
 
-                    <TextBlock Text="Общая чувствительность" Style="{StaticResource SectionHeader}"/>
+                    <TextBlock Text="{DynamicResource L.Sens}" Style="{StaticResource SectionHeader}"/>
                     <Slider x:Name="SensSlider" Minimum="0.5" Maximum="2" Value="1"
                             ValueChanged="SensSlider_ValueChanged"/>
                     <TextBlock x:Name="SensValue" Style="{StaticResource HintText}" Text="100 %"/>
 
-                    <TextBlock Text="Порог включения (доля от пика полосы)" Style="{StaticResource SectionHeader}"/>
+                    <TextBlock Text="{DynamicResource L.Threshold}" Style="{StaticResource SectionHeader}"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="130"/>
@@ -203,19 +203,19 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Басы (красный)" Foreground="#FFB4AD" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="0" Text="{DynamicResource L.Bass}" Foreground="#FFB4AD" VerticalAlignment="Center"/>
                         <Slider Grid.Row="0" Grid.Column="1" x:Name="BassThresholdSlider"
                                 Minimum="0" Maximum="1" Value="0.50" ValueChanged="Threshold_ValueChanged"/>
                         <TextBlock Grid.Row="0" Grid.Column="2" x:Name="BassThresholdValue"
                                    Style="{StaticResource HintText}" Text="50 %" HorizontalAlignment="Right" VerticalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="1" Text="Середина (зелёный)" Foreground="#A7E7B9" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="1" Text="{DynamicResource L.Mids}" Foreground="#A7E7B9" VerticalAlignment="Center"/>
                         <Slider Grid.Row="1" Grid.Column="1" x:Name="MidThresholdSlider"
                                 Minimum="0" Maximum="1" Value="0.50" ValueChanged="Threshold_ValueChanged"/>
                         <TextBlock Grid.Row="1" Grid.Column="2" x:Name="MidThresholdValue"
                                    Style="{StaticResource HintText}" Text="50 %" HorizontalAlignment="Right" VerticalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="2" Text="Верха (жёлтый)" Foreground="#FFE19B" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Row="2" Text="{DynamicResource L.Highs}" Foreground="#FFE19B" VerticalAlignment="Center"/>
                         <Slider Grid.Row="2" Grid.Column="1" x:Name="HighThresholdSlider"
                                 Minimum="0" Maximum="1" Value="0.50" ValueChanged="Threshold_ValueChanged"/>
                         <TextBlock Grid.Row="2" Grid.Column="2" x:Name="HighThresholdValue"
@@ -223,7 +223,7 @@
                     </Grid>
 
                     <TextBlock Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,10,0,0"
-                               Text="В режиме частиц доминирующая частота каждой полосы выбирает узор фигуры Хладни, а уровень полосы «трясёт» пластину."/>
+                               Text="{DynamicResource L.ChladniHint}"/>
                 </StackPanel>
             </ScrollViewer>
         </Border>

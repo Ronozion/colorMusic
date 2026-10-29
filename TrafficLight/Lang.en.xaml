@@ -1,0 +1,64 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- English (used when OS UI language is not Russian). Russian: Lang.ru.xaml. -->
+
+    <sys:String x:Key="L.Title">Frequency Traffic Light</sys:String>
+
+    <sys:String x:Key="L.Source">Audio Source</sys:String>
+    <sys:String x:Key="L.Start">▶  Start</sys:String>
+    <sys:String x:Key="L.Stop">⏹  Stop</sys:String>
+    <sys:String x:Key="L.Stopped">Stopped</sys:String>
+
+    <sys:String x:Key="L.Mode">Mode</sys:String>
+    <sys:String x:Key="L.ModeLamps">Traffic light</sys:String>
+    <sys:String x:Key="L.ModePlates">Particles — 3 plates</sys:String>
+    <sys:String x:Key="L.ModeField">Particles — single field</sys:String>
+
+    <sys:String x:Key="L.Particles">Particles per Band (GPU mode)</sys:String>
+    <sys:String x:Key="L.Monitor">Fullscreen Monitor</sys:String>
+    <sys:String x:Key="L.RefreshTip">Refresh monitor list</sys:String>
+
+    <sys:String x:Key="L.Fullscreen">⛶  Fullscreen (F11)</sys:String>
+    <sys:String x:Key="L.Windowed">🗗  Windowed (F11)</sys:String>
+    <sys:String x:Key="L.HotkeyHint">F11 — fullscreen, Esc — exit, Tab — hide/show the panel, double-click the screen — exit fullscreen.</sys:String>
+
+    <sys:String x:Key="L.AutoNorm">Per-Band Auto-Normalization</sys:String>
+    <sys:String x:Key="L.AutoNormHint">Each band follows its own recent peak (~4 s), so the loudness of a track or a recording doesn't matter. Hiss and silence never light the lamps.</sys:String>
+
+    <sys:String x:Key="L.Sens">Overall Sensitivity</sys:String>
+    <sys:String x:Key="L.Threshold">Trigger Threshold (share of the band's peak)</sys:String>
+    <sys:String x:Key="L.Bass">Bass (red)</sys:String>
+    <sys:String x:Key="L.Mids">Mids (green)</sys:String>
+    <sys:String x:Key="L.Highs">Highs (yellow)</sys:String>
+
+    <sys:String x:Key="L.ChladniHint">In particle mode the dominant frequency of each band picks the Chladni pattern, and the band level "shakes" the plate.</sys:String>
+
+    <sys:String x:Key="L.PrimaryMarker">  ·  primary</sys:String>
+    <sys:String x:Key="L.DevSystemFmt">System audio: {0}</sys:String>
+    <sys:String x:Key="L.DevMicFmt">Microphone: {0}</sys:String>
+    <sys:String x:Key="L.DevDefault">  (default)</sys:String>
+
+    <sys:String x:Key="L.StatusNoDevice">Choose a playback or recording device.</sys:String>
+    <sys:String x:Key="L.StatusSysFmt">Capturing system audio: {0} ({1} Hz)</sys:String>
+    <sys:String x:Key="L.StatusMicFmt">Recording from microphone: {0} ({1} Hz)</sys:String>
+    <sys:String x:Key="L.StatusStartErrFmt">Failed to start: {0}</sys:String>
+    <sys:String x:Key="L.StatusEnumErrFmt">Failed to enumerate devices: {0}</sys:String>
+    <sys:String x:Key="L.StatusStopped">Stopped.</sys:String>
+    <sys:String x:Key="L.StatusInterruptedFmt">Capture interrupted: {0}</sys:String>
+    <sys:String x:Key="L.StatusGpuFallbackFmt">GPU unavailable ({0}) — particles on CPU.</sys:String>
+
+    <sys:String x:Key="L.ErrTitle">Frequency Traffic Light</sys:String>
+    <sys:String x:Key="L.ErrTextFmt">The application hit an error:&#10;&#10;{0}&#10;&#10;Details: error.log next to the exe</sys:String>
+
+    <sys:String x:Key="L.BassCaption">BASS</sys:String>
+    <sys:String x:Key="L.MidsCaption">MIDS</sys:String>
+    <sys:String x:Key="L.HighsCaption">HIGHS</sys:String>
+
+    <sys:String x:Key="L.BassBandVis">BASS 20–250 Hz</sys:String>
+    <sys:String x:Key="L.MidsBandVis">MIDS 250–2000 Hz</sys:String>
+    <sys:String x:Key="L.HighsBandVis">HIGHS 2–16 kHz</sys:String>
+    <sys:String x:Key="L.HzUnit">Hz</sys:String>
+
+</ResourceDictionary>

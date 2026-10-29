@@ -89,7 +89,7 @@ public static class Displays
 
             bool primary = (info.DwFlags & 1) != 0;
             string label = $"{name}  ·  {info.RcMonitor.Right - info.RcMonitor.Left}×{info.RcMonitor.Bottom - info.RcMonitor.Top}  ·  {dpiX * 100 / 96} %"
-                         + (primary ? "  ·  основной" : "");
+                         + (primary ? App.T("L.PrimaryMarker") : "");
 
             list.Add(new MonitorInfo(hMon, name, label, info.RcMonitor, primary));
             return true;

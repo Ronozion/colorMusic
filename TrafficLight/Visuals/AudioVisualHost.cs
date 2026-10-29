@@ -23,7 +23,7 @@ public sealed class AudioVisualHost : FrameworkElement
         Color.FromRgb(0xFF, 0xC4, 0x00)
     };
 
-    private static readonly string[] BandNames = ["БАСЫ 20–250 Гц", "СЕРЕДИНА 250–2000 Гц", "ВЕРХА 2–16 кГц"];
+    private static readonly string[] BandNameKeys = ["L.BassBandVis", "L.MidsBandVis", "L.HighsBandVis"];
 
     private static readonly Typeface UiFace = new(new FontFamily("Segoe UI"),
         FontStyles.Normal, FontWeights.SemiBold, FontStretches.Normal);
@@ -190,7 +190,7 @@ public sealed class AudioVisualHost : FrameworkElement
             var color = Color.FromRgb(
                 (byte)(c.R / 2 + 0xA0), (byte)(c.G / 2 + 0xA0), (byte)(c.B / 2 + 0xA0));
 
-            var ft = new FormattedText($"{BandNames[i]} · {freqs[i]:F0} Гц · {levels[i]:P0}",
+            var ft = new FormattedText($"{App.T(BandNameKeys[i])} · {freqs[i]:F0} {App.T("L.HzUnit")} · {levels[i]:P0}",
                 CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
                 UiFace, Math.Clamp(plates[i].Width * 0.042, 11, 28),
                 new SolidColorBrush(color), dpi);

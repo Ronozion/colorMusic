@@ -33,8 +33,10 @@ time with the music.
   where it is earned.
 - **Fullscreen on a chosen monitor**, pixel-perfect, with mixed per-monitor
   DPI handled correctly.
+- **Interface language follows the OS**: Russian UI on a Russian system,
+  English everywhere else. Manual override: `TL_LANG=ru|en`.
 - Manual controls: per-band trigger threshold, overall sensitivity, particle
-  count, audio source, target monitor. (The UI itself is in Russian.)
+  count, audio source, target monitor.
 
 ## Quick start
 
@@ -90,6 +92,7 @@ TrafficLight/
   Visuals/ChladniModes.cs          — 4 pattern families (Chladni pairs, rotation, honeycombs, rosettes)
   Visuals/Displays.cs              — monitors & fullscreen (Win32)
   MainWindow.xaml(.cs)             — settings panel, devices, fullscreen
+  Lang.ru.xaml / Lang.en.xaml      — UI strings (ru/en dictionaries)
   Theme.xaml                       — dark control theme
   app.manifest                     — PerMonitorV2 DPI manifest
 AnalyzeTest/                       — synthetic analyzer test (dotnet run)
